@@ -10,11 +10,11 @@
 
 <body>
     <script>
-        // o que acontece aqui?
+        // Definindo o tamanho da tela do jogo
         const larguraJogo = 700;
         const alturaJogo = 850;
 
-        // o que essa parte faz?
+        // Configuração do jogo
         const config = {
             type: Phaser.AUTO,
             width: larguraJogo,
@@ -35,7 +35,7 @@
             }
         };
 
-        // o que acontece aqui?
+        // Inicializa o jogo
         const game = new Phaser.Game(config);
 
         var alien;
@@ -46,16 +46,17 @@
         var pontuacao = 0;
         var placar; 
 
+        // Carrega os assets necessários para o jogo
         function preload() {
             this.load.image('background', 'assets/bg.png');
             this.load.image('player', 'assets/alienigena.png');
             this.load.image('turbo_nave', 'assets/turbo.png');
-            this.load.image('plataforma_tijolo', 'assets/tijolos.png'); // Corrected asset name
+            this.load.image('plataforma_tijolo', 'assets/tijolos.png');
             this.load.image('moeda', 'assets/moeda.png');
         }
 
+        // Cria os assets na tela
         function create() {
-            // o que acontece aqui?
             this.add.image(larguraJogo/2, alturaJogo/2, 'background');
 
             fogo = this.add.sprite(0,0, 'turbo_nave');
@@ -64,38 +65,24 @@
             alien = this.physics.add.sprite(larguraJogo/2, 0, 'player');
             alien.setCollideWorldBounds(true);
             teclado = this.input.keyboard.createCursorKeys();
-            
-            plataforma1 = this.physics.add.staticImage(larguraJogo/2, alturaJogo/2, 'plataforma_tijolo');
-            plataforma2 = this.physics.add.staticImage(100, 789, 'plataforma_tijolo').setScale(1.18);
-            plataforma3 = this.physics.add.staticImage(200, 789, 'plataforma_tijolo').setScale(1.18);
-            plataforma4 = this.physics.add.staticImage(300, 789, 'plataforma_tijolo').setScale(1.18);
-            plataforma5 = this.physics.add.staticImage(400, 789, 'plataforma_tijolo').setScale(1.18);
-            plataforma6 = this.physics.add.staticImage(500, 789, 'plataforma_tijolo').setScale(1.18);
-            plataforma7 = this.physics.add.staticImage(600, 789, 'plataforma_tijolo').setScale(1.18);
-            plataforma8 = this.physics.add.staticImage(700, 789, 'plataforma_tijolo').setScale(1.18);
-            this.physics.add.collider(alien, plataforma1);
-            this.physics.add.collider(alien, plataforma2);
-            this.physics.add.collider(alien, plataforma3);
-            this.physics.add.collider(alien, plataforma4);
-            this.physics.add.collider(alien, plataforma5);
-            this.physics.add.collider(alien, plataforma6);
-            this.physics.add.collider(alien, plataforma7);
-            this.physics.add.collider(alien, plataforma8);
-
             moeda = this.physics.add.sprite(larguraJogo/2, 0, 'moeda');
             moeda.setCollideWorldBounds(true);
             moeda.setBounce(0.7);
-            this.physics.add.collider(moeda, plataforma1);
-            this.physics.add.collider(moeda, plataforma2);
-            this.physics.add.collider(moeda, plataforma3);
-            this.physics.add.collider(moeda, plataforma4);
-            this.physics.add.collider(moeda, plataforma5);
-            this.physics.add.collider(moeda, plataforma6);
-            this.physics.add.collider(moeda, plataforma7);
-            this.physics.add.collider(moeda, plataforma8);
 
-            placar = this.add.text(50, 50, 'Moedas:' + pontuacao, {fontSize:'45px', fill:'#495613'});
+            // Cria múltiplas plataformas usando um loop
+            for (let i = 0; i < 8; i++) {
+                const plataforma = this.physics.add.staticImage(100 + i * 100, 789, 'plataforma_tijolo').setScale(1.18);
+                plataforma1 = this.physics.add.staticImage(larguraJogo/2, alturaJogo/2, 'plataforma_tijolo');
+                plataformas = [plataforma, plataforma1]
+                this.physics.add.collider(alien, plataformas);
+                this.physics.add.collider(moeda, plataformas);
+            }
+            moeda.setCollideWorldBounds(true);
+            moeda.setBounce(0.7);
 
+            placar = this.add.text(70, 70, 'Moedas:' + pontuacao, {fontSize:'45px', fill:'#495613'});
+
+            // Detecta a colisão entre o alien e a moeda
             this.physics.add.overlap(alien, moeda, function(){
                 moeda.setVisible(false);
                 var posicaoMoeda_Y = Phaser.Math.RND.between(50, 650);
@@ -107,6 +94,7 @@
 
         }
 
+        // Atualiza o estado do jogo
         function update() {
             if (teclado.left.isDown) {
                 alien.setVelocityX(-150);}
@@ -121,16 +109,17 @@
             if (teclado.up.isDown) {
                 alien.setVelocityY(-150) 
                 ativarTurbo();}
-
             else { semTurbo(0); }
             fogo.setPosition(alien.x, alien.y + alien.height/2);
 
         }
 
+        // Ativa o turbo
         function ativarTurbo() {
             fogo.setVisible(true);
         }
 
+        // Desativa o turbo
         function semTurbo() {
             fogo.setVisible(false);
         }
